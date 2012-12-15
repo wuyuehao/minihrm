@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Demo: dojox/grid/DataGrid Simple Structure</title>
+<link rel="stylesheet"
+	href="//ajax.googleapis.com/ajax/libs/dojo/1.8.1/dijit/themes/claro/claro.css"
+	media="screen">
+<link rel="stylesheet"
+	href="//ajax.googleapis.com/ajax/libs/dojo/1.8.1/dojo/resources/dojo.css" />
+<link rel="stylesheet"
+	href="//ajax.googleapis.com/ajax/libs/dojo/1.8.1/dojox/grid/resources/claroGrid.css" />
+<link rel="stylesheet"
+	href="http://dojotoolkit.org/documentation/tutorials/resources/style/demo.css"
+	media="screen">
+<link rel="stylesheet"
+	href="js/dojox/grid/enhanced/resources/claro/EnhancedGrid.css"
+	media="screen">
+<link rel="stylesheet"
+	href="js/dojox/grid/enhanced/resources/EnhancedGrid_rtl.css"
+	media="screen">
+
+
+</head>
+<body class="claro">
+	<h1>Demo: dojox/grid/DataGrid Simple Structure</h1>
+
+	<br />
+	<div id="grid"></div>
+
+	<!-- load dojo and provide config via data attribute -->
+	<script src="js/dojo/dojo.js"></script>
+	<script>
+		dojo.require("dojox.grid.EnhancedGrid");
+		dojo.require("dojox.grid.enhanced.plugins.DnD");
+		dojo.require("dojox.grid.enhanced.plugins.Menu");
+		dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+		dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+		dojo.require("dojox.grid.enhanced.plugins.Pagination");
+		require([ "dojo/store/JsonRest" ], function(JsonRest) {
+			myStore = new JsonRest({
+				target : "/minihrm/employees/"
+			});
+		});
+		require([ "dojox/grid/EnhancedGrid", "dojo/data/ObjectStore",
+				"dojo/domReady!" ], function(EnhancedGrid, ObjectStore) {
+			grid = new EnhancedGrid({
+				store : dataStore = new ObjectStore({
+					objectStore : myStore
+				}),
+				structure : [ {
+					name : "Name",
+					field : "name",
+					width : "100px",
+					editable : true
+				}, {
+					name : "SN",
+					field : "sn",
+					width : "100px"
+				}, {
+					name : "PID",
+					field : "personelId",
+					width : "100px"
+				}, {
+					name : "Notes",
+					field : "notesid",
+					width : "100px"
+				}, {
+					name : "Email",
+					field : "email",
+					width : "100px"
+				}, {
+					name : "English Name",
+					field : "englisName",
+					width : "100px"
+				}, {
+					name : "Salary",
+					field : "salary",
+					width : "50px"
+				}, {
+					name : "Onboard",
+					field : "onboardDate",
+					width : "100px"
+				}, {
+					name : "Onband",
+					field : "onbandDate",
+					width : "100px"
+				}, {
+					name : "Onteam",
+					field : "onteamDate",
+					width : "100px"
+				}, {
+					name : "Manager",
+					field : "manager",
+					width : "100px"
+				}, {
+					name : "Gender",
+					field : "gender",
+					width : "20px"
+				}, {
+					name : "Job Role",
+					field : "jobRole",
+					width : "100px"
+				}, {
+					name : "Team",
+					field : "team",
+					width : "100px"
+				}, {
+					name : "PBC1 - Current",
+					field : "pbc1",
+					width : "100px"
+				}, {
+					name : "PBC2 - Last Year",
+					field : "pbc2",
+					width : "100px"
+				}, {
+					name : "PBC3",
+					field : "pbc3",
+					width : "100px"
+				} ],
+
+				onApplyCellEdit : update,
+
+				plugins : {
+					dnd : true,
+					indirectSelection : true,
+
+					pagination : {
+						pageSizes : [ '5', '10', '20', 'All' ], //注意必须是字符串，至于理由，不要问我…  
+						maxPageStep : 5, //在右边最多显示几页  
+						itemTitle : 'items', //默认把每一行称作一个item，当然可以改成别的  
+						descTemplate : '${2} - ${3} of ${1} ${0}',
+						//这个比较复杂，${0}就是刚才的itemTitle，${1}是总行数，${2}和${3}分别是起止行。  
+						description : true, //如果设置成False，就没有最左边的描述信息了  
+						sizeSwitch : true, //如果设置成False，中间的行数切换就没了  
+						pageStepper : true
+					//如果设置成False，右边的页面切换也省了  
+					}
+				}
+			}, "grid"); // make sure you have a target HTML element with this id
+			grid.startup();
+		});
+
+		function update(inValue, inRowIndex, inFieldIndex) {
+			alert(inValue + ': ' +inRowIndex + ': ' +inFieldIndex);
+			require([ "dojo/request" ], function(request) {
+				request.put("/minihrm/employees/" + inRowIndex, {
+					data : {
+						inFieldIndex : inValue
+					},
+				});
+			});
+		}
+	</script>
+
+	<div id="gridDiv"></div>
+
+	<script type="text/javascript">
+		dojo.require("dojox.grid.EnhancedGrid");
+		dojo.require("dojox.grid.enhanced.plugins.DnD");
+		dojo.require("dojox.grid.enhanced.plugins.Menu");
+		dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+		dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+
+		var grid = new dojox.grid.EnhancedGrid({
+			plugins : {
+				nestedSorting : true,
+				dnd : true,
+				indirectSelection : true,
+				menus : {
+					headerMenu : "headerMenuId",
+					rowMenu : "rowMenuId",
+					cellMenu : "cellMenuId",
+					selectedRegionMenu : "selectedRegionMenuId"
+				}
+			},
+		}, dojo.byId('gridDiv'));
+		grid.startup();
+	</script>
+</body>
+</html>
