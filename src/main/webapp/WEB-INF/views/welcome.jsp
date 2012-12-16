@@ -259,7 +259,6 @@
 			url : "/minihrm/employees/json",
 			postData : json,
 			contentType : "application/json",
-			handleAs : "text",
 			load : function(data) {
 				dojo.byId("mbar").innerHTML += "<li>" + msg + " - " + data
 						+ "</li>";
