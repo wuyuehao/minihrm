@@ -128,7 +128,7 @@ width: 100%;
 	<div id="ajaxupdate" style="background-color: Red;"></div>
 	<div id="error" class="errormsg"></div>
 	<sec:authorize
-		access="hasAnyRole('ROLE_CDL B2B SHANGHAI MGR')">
+		access="hasAnyRole('ROLE_CDL B2B SHANGHAI MGR','ROLE_MINIHRM TEST GROUP')">
 		<table id="employees" class="table table-condensed table-bordered table-striped table-hover">
 			<tr>
 				<th>Action</th>

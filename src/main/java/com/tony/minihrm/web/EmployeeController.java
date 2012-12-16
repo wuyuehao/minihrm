@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -28,7 +27,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tony.minihrm.beans.Employee;
 import com.tony.minihrm.beans.dao.EmployeeDao;
 import com.tony.minihrm.services.BandDataService;
@@ -70,7 +68,7 @@ public class EmployeeController {
 		Sort sort = new Sort(new org.springframework.data.domain.Sort.Order[] {
 				order1, order2 });
 		List returnList;
-		if (isSuperUser()) {
+		if (Util.isSuperUser()) {
 			returnList = employeeDao.findAll(sort);
 		} else {
 			returnList = employeeDao.findByManager(Util.getCurrentUsername(),
@@ -113,15 +111,6 @@ public class EmployeeController {
 				orderby);
 	}
 
-	private boolean isSuperUser() {
-		return Util
-				.getCurrentUserDetails()
-				.getAuthorities()
-				.contains(
-						new SimpleGrantedAuthority(
-								"ROLE_CDL B2B SHANGHAI UPLINE MGR"));
-	}
-
 	public String show(Long id, Model model) {
 		Employee e = employeeDao.findById(id);
 		if (e.getManager().equals(Util.getCurrentUsername()))
@@ -131,7 +120,8 @@ public class EmployeeController {
 
 	// need specify contentType : "application/json" in client side.
 	@RequestMapping(value = "/json", method = RequestMethod.POST)
-	public @ResponseBody String createFromJSON(@RequestBody Employee e) throws JsonParseException,
+	public @ResponseBody
+	String createFromJSON(@RequestBody Employee e) throws JsonParseException,
 			JsonMappingException, IOException {
 		e.setManager(Util.getCurrentUsername());
 		try {
@@ -156,11 +146,12 @@ public class EmployeeController {
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-	public @ResponseBody String update(@PathVariable("id") Long id, @RequestBody String body) {
+	public @ResponseBody
+	String update(@PathVariable("id") Long id, @RequestBody String body) {
 		Employee e = employeeDao.findById(id);
 		if (!e.getEmail().equals(Util.getCurrentUsername())
 				&& !e.getManager().equals(Util.getCurrentUsername())
-				&& !isSuperUser())
+				&& !Util.isSuperUser())
 			return "Not Authorized!";
 		String key = body.split(":")[0];
 		String value = body.split(":")[1];
@@ -245,10 +236,11 @@ public class EmployeeController {
 		return null;
 	}
 
-	@RequestMapping(value="/{id}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public String delete(@PathVariable("id") Long id, Model model) {
 		Employee e = employeeDao.findById(id);
-		if (!e.getManager().equals(Util.getCurrentUsername()) && !isSuperUser()) {
+		if (!e.getManager().equals(Util.getCurrentUsername())
+				&& !Util.isSuperUser()) {
 			return "Not Authorized!";
 		} else {
 			employeeDao.delete(id);

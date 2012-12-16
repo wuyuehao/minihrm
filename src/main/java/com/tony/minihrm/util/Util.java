@@ -3,6 +3,7 @@ package com.tony.minihrm.util;
 import java.util.Collection;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -20,6 +21,15 @@ public class Util {
 		} else {
 			return null;
 		}
+	}
+
+	public static boolean isSuperUser() {
+		if (getCurrentUserDetails() != null) {
+			return getAuthorities().contains(
+					new SimpleGrantedAuthority(
+							"ROLE_CDL B2B SHANGHAI UPLINE MGR"));
+		}
+		return false;
 	}
 
 	public static String getCurrentUsername() {
